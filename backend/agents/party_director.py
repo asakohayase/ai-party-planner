@@ -1,9 +1,8 @@
 from strands import Agent
-
 from .food_specialist import food_drink_specialist
 from .theme_specialist import theme_decoration_specialist
 from .activity_specialist import activity_entertainment_specialist
-
+from tools.time_calculator import calculate_party_duration
 
 PARTY_DIRECTOR_PROMPT = """
 You are a Party Director AI that coordinates specialized party planning agents.
@@ -12,6 +11,7 @@ You have access to these tools:
 - food_drink_specialist: for menu planning and drinks
 - theme_decoration_specialist: for decorations and themes  
 - activity_entertainment_specialist: for games and activities
+- calculate_party_duration: for calculating party duration and time of day
 
 Based on what the user wants planned, call the appropriate specialists and combine their responses into a comprehensive party plan.
 
@@ -25,5 +25,6 @@ party_director = Agent(
         food_drink_specialist,
         theme_decoration_specialist,
         activity_entertainment_specialist,
+        calculate_party_duration,
     ],
 )

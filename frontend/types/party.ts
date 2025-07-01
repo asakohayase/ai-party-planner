@@ -16,7 +16,6 @@ export interface BackendPartyRequest {
   location?: 'indoor' | 'outdoor';
   start_time?: string;
   end_time?: string;
-  duration_hours?: number;
   time_of_day?: 'morning' | 'afternoon' | 'evening';
   planning_focus: string;
   dietary_restrictions?: string;

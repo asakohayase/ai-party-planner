@@ -8,7 +8,6 @@ class PartyRequest(BaseModel):
     location: Optional[Literal["indoor", "outdoor"]] = None
     start_time: Optional[str] = None
     end_time: Optional[str] = None
-    duration_hours: Optional[float] = None
     time_of_day: Optional[Literal["morning", "afternoon", "evening"]] = None
     planning_focus: str
     dietary_restrictions: Optional[str] = None

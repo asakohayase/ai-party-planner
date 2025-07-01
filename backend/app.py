@@ -69,8 +69,10 @@ Party Planning Request:
         if request.location:
             party_details += f"- Location: {request.location} \n"
 
-        if request.start_time and request.end_time and request.duration_hours:
-            party_details += f"- Duration: {request.duration_hours} hours ({request.start_time} to {request.end_time})\n"
+        if request.start_time and request.end_time:
+            party_details += (
+                f"- Party Time: {request.start_time} to {request.end_time}\n"
+            )
 
         if request.time_of_day:
             party_details += f"- Time of Day: {request.time_of_day}\n"
