@@ -154,20 +154,20 @@ ai-party-planner/
 │   ├── requirements.txt
 │   └── pyproject.toml
 └── frontend/
-├── components/
-│   ├── ui/                   
-│   ├── party-form.tsx         # Input form
-│   └── party-plan-result.tsx  # Results display
-├── types/
-│   └── party.ts               # TypeScript interfaces
-├── app/
-│   ├── layout.tsx
-│   ├── page.tsx
-│   └── globals.css
-├── public/            
-├── package.json
-├── next.config.ts
-└── eslint.config.mjs
+    ├── components/
+    │   ├── ui/                   
+    │   ├── party-form.tsx         # Input form
+    │   └── party-plan-result.tsx  # Results display
+    ├── types/
+    │   └── party.ts               # TypeScript interfaces
+    ├── app/
+    │   ├── layout.tsx
+    │   ├── page.tsx
+    │   └── globals.css
+    ├── public/            
+    ├── package.json
+    ├── next.config.ts
+    └── eslint.config.mjs
 ```
 
 ## **4. Extending the Demo**
