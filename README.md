@@ -4,6 +4,8 @@
 
 A demonstration project showcasing the **Strands Agents SDK's "Agents as Tools"** pattern through an intelligent party planning system. This project implements a hierarchical multi-agent architecture where a Party Director coordinates three specialized agents to create comprehensive party plans.
 
+![Image](https://github.com/user-attachments/assets/894a66eb-a9f2-4f4e-b92b-d25259608621)
+
 ## **1. Agent Architecture Diagram**
 
 <img width="554" alt="Image" src="https://github.com/user-attachments/assets/643b8d0c-67bc-439c-ae16-25f7e0a60337" />
