@@ -6,58 +6,25 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Textarea } from './ui/textarea';
-
-interface PartyRequest {
-  occasion: string;
-  guest_count: number;
-  location: 'indoor' | 'outdoor';
-  start_time: string;
-  end_time: string;
-  planning_focus: string;  // Free text description
-  dietary_restrictions?: string;
-  guest_ages?: 'kids' | 'adults' | 'mixed';
-  special_requests?: string;
-}
-
-// Backend interface (what the API expects)
-interface BackendPartyRequest {
-  occasion: string;
-  guest_count: number;
-  location: 'indoor' | 'outdoor';
-  start_time: string;
-  end_time: string;
-  duration_hours: number;
-  time_of_day: 'morning' | 'afternoon' | 'evening';
-  planning_focus: string;  // Free text description
-  dietary_restrictions?: string;
-  guest_ages?: 'kids' | 'adults' | 'mixed';
-  special_requests?: string;
-}
-
-interface PartyFormProps {
-  onSubmit: (request: BackendPartyRequest) => void;
-  loading: boolean;
-}
+import { BackendPartyRequest, PartyFormProps, PartyRequest } from '@/types/party';
 
 export function PartyForm({ onSubmit, loading }: PartyFormProps) {
   const [formData, setFormData] = useState<Partial<PartyRequest>>({
-    guest_count: 8,
-    location: 'indoor',
-    start_time: '14:00',
-    end_time: '17:00'
-    // No default text for planning_focus - let it be empty
   });
 
   // Convert frontend data to backend format
   const convertToBackendFormat = (frontendData: PartyRequest): BackendPartyRequest => {
-    // Calculate actual duration in hours
+  let duration_hours: number | undefined;
+  let time_of_day: 'morning' | 'afternoon' | 'evening' | undefined;
+
+  // Only calculate if both times are provided
+  if (frontendData.start_time && frontendData.end_time) {
     const start = new Date(`2000-01-01T${frontendData.start_time}`);
     const end = new Date(`2000-01-01T${frontendData.end_time}`);
-    const duration_hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+    duration_hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
 
     // Determine time of day from start time
     const startHour = parseInt(frontendData.start_time.split(':')[0]);
-    let time_of_day: 'morning' | 'afternoon' | 'evening';
     if (startHour < 12) {
       time_of_day = 'morning';
     } else if (startHour < 18) {
@@ -65,25 +32,26 @@ export function PartyForm({ onSubmit, loading }: PartyFormProps) {
     } else {
       time_of_day = 'evening';
     }
+  }
 
-    return {
-      occasion: frontendData.occasion,
-      guest_count: frontendData.guest_count,
-      location: frontendData.location,
-      start_time: frontendData.start_time,
-      end_time: frontendData.end_time,
-      duration_hours,
-      time_of_day,
-      planning_focus: frontendData.planning_focus || '',
-      dietary_restrictions: frontendData.dietary_restrictions,
-      guest_ages: frontendData.guest_ages,
-      special_requests: frontendData.special_requests,
-    };
+  return {
+    occasion: frontendData.occasion,
+    guest_count: frontendData.guest_count, // Remove || undefined
+    location: frontendData.location, // Remove || undefined  
+    start_time: frontendData.start_time, // Remove || undefined
+    end_time: frontendData.end_time, // Remove || undefined
+    duration_hours,
+    time_of_day,
+    planning_focus: frontendData.planning_focus || '',
+    dietary_restrictions: frontendData.dietary_restrictions,
+    guest_ages: frontendData.guest_ages,
+    special_requests: frontendData.special_requests,
   };
+};
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.occasion && formData.guest_count && formData.location && formData.start_time && formData.end_time && formData.planning_focus) {
+    if (formData.occasion && formData.planning_focus) {
       const backendData = convertToBackendFormat(formData as PartyRequest);
       onSubmit(backendData);
     }
@@ -106,6 +74,20 @@ export function PartyForm({ onSubmit, loading }: PartyFormProps) {
       <div className="bg-white/95 backdrop-blur-xl px-8 py-8 rounded-b-3xl shadow-2xl">
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Required Fields */}
+            <div className="space-y-3">
+              <Label htmlFor="planning_focus" className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                What do you want to plan? <span className="text-orange-500">*</span>
+              </Label>
+              <Input
+                id="planning_focus"
+                placeholder="e.g., Food and decorations, Just activities, Everything..."
+                value={formData.planning_focus || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, planning_focus: e.target.value }))}
+                className="h-12 text-base leading-none border border-gray-200 focus:border-orange-400 focus:ring-orange-400/20 rounded-lg bg-white shadow-sm transition-all duration-200 px-4"
+                required
+              />
+            </div>
+
           <div className="space-y-6">
             <div className="space-y-3">
               <Label htmlFor="occasion" className="text-lg font-semibold text-gray-800 flex items-center gap-2">
@@ -123,7 +105,7 @@ export function PartyForm({ onSubmit, loading }: PartyFormProps) {
 
             <div className="space-y-3">
               <Label htmlFor="guest_count" className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                How many guests? <span className="text-orange-500">*</span>
+                How many guests?
               </Label>
               <Input
                 id="guest_count"
@@ -133,13 +115,12 @@ export function PartyForm({ onSubmit, loading }: PartyFormProps) {
                 value={formData.guest_count || ''}
                 onChange={(e) => setFormData(prev => ({ ...prev, guest_count: parseInt(e.target.value) }))}
                 className="h-12 text-base leading-none border border-gray-200 focus:border-orange-400 focus:ring-orange-400/20 rounded-lg bg-white shadow-sm transition-all duration-200 px-4"
-                required
               />
             </div>
 
             <div className="space-y-3">
               <Label className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                Location <span className="text-orange-500">*</span>
+                Location
               </Label>
               <Select value={formData.location} onValueChange={(value: 'indoor' | 'outdoor') => 
                 setFormData(prev => ({ ...prev, location: value }))}>
@@ -156,7 +137,7 @@ export function PartyForm({ onSubmit, loading }: PartyFormProps) {
             {/* Time Section  */}
             <div className="space-y-4">
               <Label className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                Party Time <span className="text-orange-500">*</span>
+                Party Time
               </Label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -169,7 +150,6 @@ export function PartyForm({ onSubmit, loading }: PartyFormProps) {
                     value={formData.start_time || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, start_time: e.target.value }))}
                     className="h-12 text-base leading-none border border-gray-200 focus:border-orange-400 focus:ring-orange-400/20 rounded-lg bg-white shadow-sm transition-all duration-200 px-4"
-                    required
                   />
                 </div>
 
@@ -183,7 +163,6 @@ export function PartyForm({ onSubmit, loading }: PartyFormProps) {
                     value={formData.end_time || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, end_time: e.target.value }))}
                     className="h-12 text-base leading-none border border-gray-200 focus:border-orange-400 focus:ring-orange-400/20 rounded-lg bg-white shadow-sm transition-all duration-200 px-4"
-                    required
                   />
                 </div>
               </div>
@@ -198,24 +177,6 @@ export function PartyForm({ onSubmit, loading }: PartyFormProps) {
                   })()}
                 </div>
               )}
-            </div>
-
-            {/* What do you want to plan section */}
-            <div className="space-y-3">
-              <Label htmlFor="planning_focus" className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                What do you want to plan? <span className="text-orange-500">*</span>
-              </Label>
-              <Input
-                id="planning_focus"
-                placeholder="e.g., Food and decorations, Just activities, Everything..."
-                value={formData.planning_focus || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, planning_focus: e.target.value }))}
-                className="h-12 text-base leading-none border border-gray-200 focus:border-orange-400 focus:ring-orange-400/20 rounded-lg bg-white shadow-sm transition-all duration-200 px-4"
-                required
-              />
-              <p className="text-sm text-gray-500">
-                Tell us what aspects you&apos;d like help with (food, decorations, activities, music, etc.)
-              </p>
             </div>
           </div>
 
