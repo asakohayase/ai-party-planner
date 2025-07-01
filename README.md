@@ -1,28 +1,19 @@
-AI Party Planner 🎉
-Strands Agents SDK Demo: "Agents as Tools" Pattern
-A demonstration project showcasing the Strands Agents SDK's "Agents as Tools" pattern through an intelligent party planning system. This project implements a hierarchical multi-agent architecture where a Party Director coordinates three specialized agents to create comprehensive party plans.
-Agent Architecture Diagram
-                    User Request
-                         ↓
-              ┌─────────────────────┐
-              │   Party Director    │ ← Orchestrator Agent
-              │   (Coordinator)     │
-              └─────────┬───────────┘
-                        │
-        ┌───────────────┼───────────────┼───────────────┐
-        ↓               ↓               ↓               ↓
-┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
-│ Food & Drink │ │ Theme & Deco │ │ Activity &   │ │ Calculator   │ 
-│ Specialist   │ │ Specialist   │ │ Entertainment│ │ Tool         │ 
-│   (@tool)    │ │   (@tool)    │ │   (@tool)    │ │ (regular)    │ 
-└──────────────┘ └──────────────┘ └──────────────┘ └──────────────┘
-     ↑                    ↑                    ↑               ↑
-Agents as Tools                                          Regular Tool
+# **AI Party Planner** 🎉
 
-Core Implementation
-1. Party Director (Orchestrator)
+### Strands Agents SDK Demo: "Agents as Tools" Pattern
+
+A demonstration project showcasing the **Strands Agents SDK's "Agents as Tools"** pattern through an intelligent party planning system. This project implements a hierarchical multi-agent architecture where a Party Director coordinates three specialized agents to create comprehensive party plans.
+
+## **Agent Architecture Diagram**
+
+
+## **Core Implementation**
+
+### **1. Party Director (Orchestrator)**
 The main agent coordinates specialists based on user requirements:
-pythonfrom strands import Agent
+
+```python
+from strands import Agent
 from .food_specialist import food_drink_specialist
 from .theme_specialist import theme_decoration_specialist
 from .activity_specialist import activity_entertainment_specialist
@@ -49,9 +40,13 @@ party_director = Agent(
         activity_entertainment_specialist,
     ],
 )
-2. Specialist Agents as Tools
-Each specialist is wrapped with the @tool decorator, making them callable by the orchestrator:
-pythonfrom strands import Agent, tool
+```
+
+### **2. Specialist Agents as Tools**
+Each specialist is wrapped with the `@tool` decorator, making them callable by the orchestrator:
+
+```python
+from strands import Agent, tool
 
 ACTIVITY_SPECIALIST_PROMPT = """
 You are an Activity & Entertainment Specialist for home parties in the US. Focus on:
@@ -79,21 +74,25 @@ def activity_entertainment_specialist(party_details: str) -> str:
         return str(response)
     except Exception as e:
         return f"Error in activity & entertainment planning: {str(e)}"
-Key Strands SDK Features Demonstrated
+```
 
-Simple Agent Creation: Strands SDK only requires a model, prompt, and tools - no complex setup needed
-Agents as Tools: Specialist agents wrapped with @tool decorator for hierarchical coordination
-Intelligent Tool Selection: Dynamic agent routing based on user requirements
+### **3. Key Strands SDK Features Demonstrated**
 
-Quick Start
-Prerequisites
+- **Simple Agent Creation**: Strands SDK only requires a model, prompt, and tools - no complex setup needed
+- **Agents as Tools**: Specialist agents wrapped with `@tool` decorator for hierarchical coordination
+- **Intelligent Tool Selection**: Dynamic agent routing based on user requirements
 
-Python 3.11+, Node.js 18+
-Strands Agents SDK: pip install strands-agents
-AI provider API key
 
-Installation
-bash# Clone and setup
+### **4. Quick Startd**
+
+### **Prerequisites**
+- Python 3.11+, Node.js 18+
+- Strands Agents SDK: `pip install strands-agents`
+- AI provider API key
+
+### **5. Installation**
+```bash
+# Clone and setup
 git clone https://github.com/your-username/ai-party-planner.git
 cd ai-party-planner
 
@@ -120,8 +119,10 @@ uvicorn app:app --reload --port 8000
 # In a new terminal, run frontend
 cd frontend
 npm run dev
-Access: http://localhost:3000
-Project Structure
+```
+
+### **6. Project Structure**
+```
 ai-party-planner/
 ├── backend/
 │   ├── agents/
@@ -141,21 +142,20 @@ ai-party-planner/
     │   ├── layout.tsx
     │   └── page.tsx
     └── package.json
-Extending the Demo
-New Specialist Ideas:
+```
 
-Music & Playlist Specialist - Spotify API, music recommendation tools
-Budget & Cost Calculator - calculation tools, price lookup APIs
-Invitation Designer - image generation tools, template libraries
-Cleanup Coordinator - scheduling tools, checklist generators
-Weather Advisor - weather APIs, outdoor activity recommendations
-Photo Booth Specialist - camera tools, prop suggestion databases
+## **7. Extending the Demo**
 
-Links
+**New Specialist Ideas:**
+- **Music & Playlist Specialist** - Spotify API, music recommendation tools
+- **Budget & Cost Calculator** - calculation tools, price lookup APIs  
+- **Invitation Designer** - image generation tools, template libraries
+- **Cleanup Coordinator** - scheduling tools, checklist generators
+- **Weather Advisor** - weather APIs, outdoor activity recommendations
+- **Photo Booth Specialist** - camera tools, prop suggestion databases
 
-Live Demo: https://ai-party-planner.vercel.app
-Strands Agents SDK: https://docs.strands.ai
-Multi-Agent Examples: https://github.com/strands-agents/docs/blob/main/docs/examples/
+## **8. Links**
+- **Live Demo:** https://ai-party-planner.vercel.app
+- **Strands Agents SDK:** https://docs.strands.ai  
+- **Multi-Agent Examples:** https://github.com/strands-agents/docs/blob/main/docs/examples/
 
-
-This project demonstrates how Strands Agents SDK enables building sophisticated multi-agent systems through the "Agents as Tools" pattern, showcasing intelligent coordination, modular design, and practical real-world applications. 🚀
