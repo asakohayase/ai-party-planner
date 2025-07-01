@@ -11,7 +11,7 @@ A demonstration project showcasing the **Strands Agents SDK's "Agents as Tools"*
 
 ## **2. Core Implementation**
 
-### **a. Party Director (Orchestrator)**
+### **2-1. Party Director (Orchestrator)**
 The main agent coordinates specialists based on user requirements:
 
 ```python
@@ -44,7 +44,7 @@ party_director = Agent(
 )
 ```
 
-### **b. Specialist Agents as Tools**
+### **2-2. Specialist Agents as Tools**
 Each specialist is wrapped with the `@tool` decorator, making them callable by the orchestrator:
 
 ```python
@@ -78,21 +78,21 @@ def activity_entertainment_specialist(party_details: str) -> str:
         return f"Error in activity & entertainment planning: {str(e)}"
 ```
 
-### **c. Key Strands SDK Features Demonstrated**
+### **2-3. Key Strands SDK Features Demonstrated**
 
 - **Simple Agent Creation**: Strands SDK only requires a model, prompt, and tools - no complex setup needed
 - **Agents as Tools**: Specialist agents wrapped with `@tool` decorator for hierarchical coordination
 - **Intelligent Tool Selection**: Dynamic agent routing based on user requirements
 
 
-### **d. Quick Startd**
+## **3. Quick Start**
 
 ### **Prerequisites**
 - Python 3.11+, Node.js 18+
 - uv package manager: `pip install uv`
 - AWS credentials for Strands Agents SDK
 
-### **e. Installation**
+### **. Installation**
 
 1. **Clone and setup:**
 ```bash
