@@ -31,8 +31,7 @@ export interface PartyPlanResponse {
   timestamp: string;
 }
 
-
 export interface PartyFormProps {
-  onSubmit: (data: BackendPartyRequest) => void;
+  onSubmit: (data: BackendPartyRequest) => Promise<void>;
   loading: boolean;
 }

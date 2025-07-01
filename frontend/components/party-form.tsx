@@ -14,45 +14,77 @@ export function PartyForm({ onSubmit, loading }: PartyFormProps) {
 
   // Convert frontend data to backend format
   const convertToBackendFormat = (frontendData: PartyRequest): BackendPartyRequest => {
-  let duration_hours: number | undefined;
-  let time_of_day: 'morning' | 'afternoon' | 'evening' | undefined;
+    let duration_hours: number | undefined;
+    let time_of_day: 'morning' | 'afternoon' | 'evening' | undefined;
 
-  // Only calculate if both times are provided
-  if (frontendData.start_time && frontendData.end_time) {
-    const start = new Date(`2000-01-01T${frontendData.start_time}`);
-    const end = new Date(`2000-01-01T${frontendData.end_time}`);
-    duration_hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+    // Only calculate if both times are provided
+    if (frontendData.start_time && frontendData.end_time) {
+      const start = new Date(`2000-01-01T${frontendData.start_time}`);
+      const end = new Date(`2000-01-01T${frontendData.end_time}`);
+      duration_hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
 
-    // Determine time of day from start time
-    const startHour = parseInt(frontendData.start_time.split(':')[0]);
-    if (startHour < 12) {
-      time_of_day = 'morning';
-    } else if (startHour < 18) {
-      time_of_day = 'afternoon';
-    } else {
-      time_of_day = 'evening';
+      // Determine time of day from start time
+      const startHour = parseInt(frontendData.start_time.split(':')[0]);
+      if (startHour < 12) {
+        time_of_day = 'morning';
+      } else if (startHour < 18) {
+        time_of_day = 'afternoon';
+      } else {
+        time_of_day = 'evening';
+      }
     }
-  }
 
-  return {
-    occasion: frontendData.occasion,
-    guest_count: frontendData.guest_count, // Remove || undefined
-    location: frontendData.location, // Remove || undefined  
-    start_time: frontendData.start_time, // Remove || undefined
-    end_time: frontendData.end_time, // Remove || undefined
-    duration_hours,
-    time_of_day,
-    planning_focus: frontendData.planning_focus || '',
-    dietary_restrictions: frontendData.dietary_restrictions,
-    guest_ages: frontendData.guest_ages,
-    special_requests: frontendData.special_requests,
+    // Build the request object, only including fields that have values
+    const request: BackendPartyRequest = {
+      occasion: frontendData.occasion,
+      planning_focus: frontendData.planning_focus || '',
+    };
+
+    // Only add optional fields if they have actual values
+    if (frontendData.guest_count && frontendData.guest_count > 0) {
+      request.guest_count = frontendData.guest_count;
+    }
+
+    if (frontendData.location) {
+      request.location = frontendData.location;
+    }
+
+    if (frontendData.start_time) {
+      request.start_time = frontendData.start_time;
+    }
+
+    if (frontendData.end_time) {
+      request.end_time = frontendData.end_time;
+    }
+
+    if (duration_hours && duration_hours > 0) {
+      request.duration_hours = duration_hours;
+    }
+
+    if (time_of_day) {
+      request.time_of_day = time_of_day;
+    }
+
+    if (frontendData.dietary_restrictions?.trim()) {
+      request.dietary_restrictions = frontendData.dietary_restrictions.trim();
+    }
+
+    if (frontendData.guest_ages) {
+      request.guest_ages = frontendData.guest_ages;
+    }
+
+    if (frontendData.special_requests?.trim()) {
+      request.special_requests = frontendData.special_requests.trim();
+    }
+
+    return request;
   };
-};
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.occasion && formData.planning_focus) {
       const backendData = convertToBackendFormat(formData as PartyRequest);
+      console.log('Sending data to backend:', JSON.stringify(backendData, null, 2)); // Add this line for debugging
       onSubmit(backendData);
     }
   };
@@ -74,19 +106,19 @@ export function PartyForm({ onSubmit, loading }: PartyFormProps) {
       <div className="bg-white/95 backdrop-blur-xl px-8 py-8 rounded-b-3xl shadow-2xl">
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Required Fields */}
-            <div className="space-y-3">
-              <Label htmlFor="planning_focus" className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                What do you want to plan? <span className="text-orange-500">*</span>
-              </Label>
-              <Input
-                id="planning_focus"
-                placeholder="e.g., Food and decorations, Just activities, Everything..."
-                value={formData.planning_focus || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, planning_focus: e.target.value }))}
-                className="h-12 text-base leading-none border border-gray-200 focus:border-orange-400 focus:ring-orange-400/20 rounded-lg bg-white shadow-sm transition-all duration-200 px-4"
-                required
-              />
-            </div>
+          <div className="space-y-3">
+            <Label htmlFor="planning_focus" className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+              What do you want to plan? <span className="text-orange-500">*</span>
+            </Label>
+            <Input
+              id="planning_focus"
+              placeholder="e.g., Food and decorations, Just activities, Everything..."
+              value={formData.planning_focus || ''}
+              onChange={(e) => setFormData(prev => ({ ...prev, planning_focus: e.target.value }))}
+              className="h-12 text-base leading-none border border-gray-200 focus:border-orange-400 focus:ring-orange-400/20 rounded-lg bg-white shadow-sm transition-all duration-200 px-4"
+              required
+            />
+          </div>
 
           <div className="space-y-6">
             <div className="space-y-3">
@@ -152,7 +184,6 @@ export function PartyForm({ onSubmit, loading }: PartyFormProps) {
                     className="h-12 text-base leading-none border border-gray-200 focus:border-orange-400 focus:ring-orange-400/20 rounded-lg bg-white shadow-sm transition-all duration-200 px-4"
                   />
                 </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="end_time" className="text-sm font-medium text-gray-600">
                     End Time
@@ -166,96 +197,74 @@ export function PartyForm({ onSubmit, loading }: PartyFormProps) {
                   />
                 </div>
               </div>
-              {/* Duration Display */}
-              {formData.start_time && formData.end_time && (
-                <div className="text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
-                  Duration: {(() => {
-                    const start = new Date(`2000-01-01T${formData.start_time}`);
-                    const end = new Date(`2000-01-01T${formData.end_time}`);
-                    const diff = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
-                    return diff > 0 ? `${diff} hour${diff !== 1 ? 's' : ''}` : 'Invalid time range';
-                  })()}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Optional Fields */}
-          <div className="space-y-6 pt-6 border-t border-gray-200">
-            <h3 className="text-xl font-semibold text-gray-800 flex items-center gap-3">
-              Optional Details
-            </h3>
-            
-            <div className="space-y-3">
-              <Label htmlFor="dietary_restrictions" className="text-lg font-semibold text-gray-800">
-                Dietary restrictions
-              </Label>
-              <Input
-                id="dietary_restrictions"
-                placeholder="Vegetarian, gluten-free, allergies, etc..."
-                value={formData.dietary_restrictions || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, dietary_restrictions: e.target.value }))}
-                className="h-12 text-base leading-none border border-gray-200 focus:border-emerald-400 focus:ring-emerald-400/20 rounded-lg bg-white shadow-sm transition-all duration-200 px-4"
-              />
             </div>
 
+            {/* Guest Ages */}
             <div className="space-y-3">
-              <Label className="text-lg font-semibold text-gray-800">
-                Guest ages
+              <Label className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                Guest Ages
               </Label>
-              <Select
-                value={formData.guest_ages}
-                onValueChange={(value: 'kids' | 'adults' | 'mixed') =>
-                  setFormData((prev) => ({ ...prev, guest_ages: value }))
-                }
-              >
-                <SelectTrigger className="h-12 border border-gray-200 focus:border-emerald-400 focus:ring-emerald-400/20 rounded-lg bg-white shadow-sm transition-all duration-200 px-4 text-left text-base">
-                  <SelectValue
-                    placeholder="Select age group"
-                    className="text-base"
-                  />
+              <Select value={formData.guest_ages} onValueChange={(value: 'kids' | 'adults' | 'mixed') => 
+                setFormData(prev => ({ ...prev, guest_ages: value }))}>
+                <SelectTrigger className="h-12 text-base leading-none border border-gray-200 focus:border-orange-400 focus:ring-orange-400/20 rounded-lg bg-white shadow-sm transition-all duration-200 px-4">
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="rounded-lg border border-gray-200 bg-white shadow-lg">
                   <SelectItem value="kids">Kids</SelectItem>
                   <SelectItem value="adults">Adults</SelectItem>
-                  <SelectItem value="mixed">Mixed ages</SelectItem>
+                  <SelectItem value="mixed">Mixed</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
+            {/* Dietary Restrictions */}
             <div className="space-y-3">
-              <Label htmlFor="special_requests" className="text-lg font-semibold text-gray-800">
-                Special requests
+              <Label htmlFor="dietary_restrictions" className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                Dietary Restrictions
+              </Label>
+              <Input
+                id="dietary_restrictions"
+                placeholder="e.g., Vegetarian, gluten-free, nut allergies..."
+                value={formData.dietary_restrictions || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, dietary_restrictions: e.target.value }))}
+                className="h-12 text-base leading-none border border-gray-200 focus:border-orange-400 focus:ring-orange-400/20 rounded-lg bg-white shadow-sm transition-all duration-200 px-4"
+              />
+            </div>
+
+            {/* Special Requests */}
+            <div className="space-y-3">
+              <Label htmlFor="special_requests" className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                Special Requests
               </Label>
               <Textarea
                 id="special_requests"
-                placeholder="Any specific themes, activities, or special requirements..."
+                placeholder="Any special requests or themes for your party..."
                 value={formData.special_requests || ''}
                 onChange={(e) => setFormData(prev => ({ ...prev, special_requests: e.target.value }))}
-                className="min-h-[100px] text-base leading-relaxed resize-none border border-gray-200 focus:border-emerald-400 focus:ring-emerald-400/20 rounded-lg bg-white shadow-sm p-4 transition-all duration-200"
+                className="min-h-[100px] text-base leading-relaxed border border-gray-200 focus:border-orange-400 focus:ring-orange-400/20 rounded-lg bg-white shadow-sm transition-all duration-200 px-4 py-3 resize-none"
               />
             </div>
           </div>
 
-          <Button 
-            type="submit" 
-            className="w-full h-16 text-xl font-bold text-white border-0 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl shadow-xl rounded-xl relative overflow-hidden group bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600 hover:from-orange-500 hover:via-pink-600 hover:to-purple-700 backdrop-blur-md" 
-            disabled={loading}
-          >
-            <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-50 group-hover:opacity-70 transition-opacity duration-300"></div>
-            <div className="relative z-10">
+          {/* Submit Button */}
+          <div className="pt-4">
+            <Button 
+              type="submit" 
+              disabled={loading || !formData.occasion || !formData.planning_focus}
+              className="w-full h-14 text-lg font-bold bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            >
               {loading ? (
-                <div className="flex items-center justify-center gap-3">
+                <div className="flex items-center gap-3">
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Creating your amazing party plan...
+                  Planning your perfect party...
                 </div>
               ) : (
-                <span className="flex items-center justify-center gap-3">
-                  🎊 Create My Amazing Party Plan 🍹
-                </span>
+                <>
+                  🎉 Plan My Party! 🎉
+                </>
               )}
-            </div>
-          </Button>
+            </Button>
+          </div>
         </form>
       </div>
     </div>

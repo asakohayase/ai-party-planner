@@ -3,22 +3,7 @@
 import { useState } from 'react';
 import { PartyForm } from '../components/party-form';
 import { PartyPlanResult } from '../components/party-plan-result';
-import { PartyPlanResponse } from '../types/party';
-
-// Backend interface (what the API expects)
-interface BackendPartyRequest {
-  occasion: string;
-  guest_count: number;
-  location: 'indoor' | 'outdoor';
-  start_time: string;
-  end_time: string;
-  duration_hours: number;
-  time_of_day: 'morning' | 'afternoon' | 'evening';
-  planning_focus: string;
-  dietary_restrictions?: string;
-  guest_ages?: 'kids' | 'adults' | 'mixed';
-  special_requests?: string;
-}
+import { PartyPlanResponse, BackendPartyRequest } from '../types/party';
 
 // Define proper error response types
 interface ErrorDetail {
@@ -42,6 +27,8 @@ export default function Home() {
     setError(null);
 
     try {
+      console.log('Sending request to backend:', JSON.stringify(request, null, 2));
+      
       // Call Python backend API
       const response = await fetch('http://localhost:8000/api/party-plan', {
         method: 'POST',
@@ -55,13 +42,21 @@ export default function Home() {
         let errorMessage = `HTTP error! status: ${response.status}`;
         try {
           const errorData: ErrorResponse = await response.json();
+          console.log('Error response from backend:', errorData);
+          
           // Handle different error response formats
           if (typeof errorData === 'string') {
             errorMessage = errorData;
+          } else if (errorData.detail && Array.isArray(errorData.detail)) {
+            // Log detailed field errors for debugging
+            errorData.detail.forEach((err: ErrorDetail) => {
+              console.log(`Field error - Location: ${err.loc?.join('.')}, Message: ${err.msg}, Type: ${err.type}`);
+            });
+            errorMessage = errorData.detail.map((err: ErrorDetail) => 
+              `${err.loc?.[1] || 'unknown field'}: ${err.msg || err.type || 'Unknown error'}`
+            ).join(', ');
           } else if (errorData.detail) {
-            errorMessage = Array.isArray(errorData.detail) 
-              ? errorData.detail.map((err: ErrorDetail) => err.msg || err.type || 'Unknown error').join(', ')
-              : errorData.detail;
+            errorMessage = errorData.detail;
           } else if (errorData.message) {
             errorMessage = errorData.message;
           }

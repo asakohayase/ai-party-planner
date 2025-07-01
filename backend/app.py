@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 import os
 from dotenv import load_dotenv
+from pydantic import ValidationError
 
 from models.party_request import PartyRequest, PartyPlanResponse
 from agents.party_director import party_director
@@ -28,14 +29,28 @@ async def root():
 
 
 @app.post("/api/party-plan", response_model=PartyPlanResponse)
-async def create_party_plan(request: PartyRequest):
+async def create_party_plan(request_data: dict):
     """
     Generate a party plan using AI specialists.
     """
     try:
+        print("Raw request data received:", request_data)
+
+        # Try to parse the request data
+        try:
+            request = PartyRequest(**request_data)
+            print("Successfully parsed request:", request.dict())
+        except ValidationError as e:
+            print("Pydantic validation error:", e.errors())
+            # Return detailed validation errors
+            raise HTTPException(status_code=422, detail=e.errors())
+
         # Validate required fields
         if not request.occasion or not request.planning_focus:
-            raise HTTPException(status_code=400, detail="Missing required fields")
+            raise HTTPException(
+                status_code=400,
+                detail="Missing required fields: occasion and planning_focus",
+            )
 
         # Format the party request with proper handling of optional fields
         party_details = f"""
@@ -68,26 +83,24 @@ Party Planning Request:
 
         party_details += f"\nBased on the planning focus '{request.planning_focus}', please call the appropriate specialist tools and create a comprehensive party plan."
 
-        # Generate the party plan using the agent directly
-        plan_content = party_director(party_details)
+        print("Party details being sent to agent:", party_details)
+
+        # Call the party director agent
+        response = party_director(party_details)
 
         return PartyPlanResponse(
             success=True,
-            plan=str(plan_content),
-            specialist_used="comprehensive",
+            plan=str(response),
+            specialist_used="Party Director with specialized agents",
             timestamp=datetime.now().isoformat(),
         )
 
+    except HTTPException:
+        # Re-raise HTTP exceptions as-is
+        raise
     except Exception as e:
-        print(f"Error generating party plan: {str(e)}")
-        raise HTTPException(
-            status_code=500, detail=f"Failed to generate party plan: {str(e)}"
-        )
-
-
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy", "timestamp": datetime.now().isoformat()}
+        print("Unexpected error in create_party_plan:", str(e))
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 
 if __name__ == "__main__":

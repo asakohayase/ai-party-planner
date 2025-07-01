@@ -1,6 +1,5 @@
 from strands import Agent
 
-from backend.tools.time_calculator import calculate_party_duration
 from .food_specialist import food_drink_specialist
 from .theme_specialist import theme_decoration_specialist
 from .activity_specialist import activity_entertainment_specialist
@@ -13,9 +12,11 @@ You have access to these tools:
 - food_drink_specialist: for menu planning and drinks
 - theme_decoration_specialist: for decorations and themes  
 - activity_entertainment_specialist: for games and activities
-- calculate_party_duration: for calculating party duration and time of day (use when start_time and end_time are provided)
 
-Based on what the user wants planned, call the appropriate specialists and combine their responses...
+Based on what the user wants planned, call the appropriate specialists and combine their responses into a comprehensive party plan.
+
+Always structure your response with clear sections and provide practical, actionable advice.
+Focus on the specific planning aspects the user requested.
 """
 
 party_director = Agent(
@@ -24,6 +25,5 @@ party_director = Agent(
         food_drink_specialist,
         theme_decoration_specialist,
         activity_entertainment_specialist,
-        calculate_party_duration,
     ],
 )
