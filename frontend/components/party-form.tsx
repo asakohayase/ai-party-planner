@@ -6,10 +6,36 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Textarea } from './ui/textarea';
-import { PartyRequest } from '../types/party';
+
+interface PartyRequest {
+  occasion: string;
+  guest_count: number;
+  location: 'indoor' | 'outdoor';
+  start_time: string;
+  end_time: string;
+  planning_focus: string;  // Free text description
+  dietary_restrictions?: string;
+  guest_ages?: 'kids' | 'adults' | 'mixed';
+  special_requests?: string;
+}
+
+// Backend interface (what the API expects)
+interface BackendPartyRequest {
+  occasion: string;
+  guest_count: number;
+  location: 'indoor' | 'outdoor';
+  start_time: string;
+  end_time: string;
+  duration_hours: number;
+  time_of_day: 'morning' | 'afternoon' | 'evening';
+  planning_focus: string;  // Free text description
+  dietary_restrictions?: string;
+  guest_ages?: 'kids' | 'adults' | 'mixed';
+  special_requests?: string;
+}
 
 interface PartyFormProps {
-  onSubmit: (request: PartyRequest) => void;
+  onSubmit: (request: BackendPartyRequest) => void;
   loading: boolean;
 }
 
@@ -17,22 +43,57 @@ export function PartyForm({ onSubmit, loading }: PartyFormProps) {
   const [formData, setFormData] = useState<Partial<PartyRequest>>({
     guest_count: 8,
     location: 'indoor',
-    duration: 'halfday',
-    time_of_day: 'afternoon'
+    start_time: '14:00',
+    end_time: '17:00'
+    // No default text for planning_focus - let it be empty
   });
+
+  // Convert frontend data to backend format
+  const convertToBackendFormat = (frontendData: PartyRequest): BackendPartyRequest => {
+    // Calculate actual duration in hours
+    const start = new Date(`2000-01-01T${frontendData.start_time}`);
+    const end = new Date(`2000-01-01T${frontendData.end_time}`);
+    const duration_hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+
+    // Determine time of day from start time
+    const startHour = parseInt(frontendData.start_time.split(':')[0]);
+    let time_of_day: 'morning' | 'afternoon' | 'evening';
+    if (startHour < 12) {
+      time_of_day = 'morning';
+    } else if (startHour < 18) {
+      time_of_day = 'afternoon';
+    } else {
+      time_of_day = 'evening';
+    }
+
+    return {
+      occasion: frontendData.occasion,
+      guest_count: frontendData.guest_count,
+      location: frontendData.location,
+      start_time: frontendData.start_time,
+      end_time: frontendData.end_time,
+      duration_hours,
+      time_of_day,
+      planning_focus: frontendData.planning_focus || '',
+      dietary_restrictions: frontendData.dietary_restrictions,
+      guest_ages: frontendData.guest_ages,
+      special_requests: frontendData.special_requests,
+    };
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.occasion && formData.guest_count && formData.location) {
-      onSubmit(formData as PartyRequest);
+    if (formData.occasion && formData.guest_count && formData.location && formData.start_time && formData.end_time && formData.planning_focus) {
+      const backendData = convertToBackendFormat(formData as PartyRequest);
+      onSubmit(backendData);
     }
   };
 
   return (
     <div className="w-full max-w-2xl mx-auto">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-orange-400 via-pink-500 via-purple-500 to-blue-500 text-white relative rounded-t-3xl shadow-2xl">
-        <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 via-orange-400/20 via-pink-400/20 to-blue-400/20 rounded-t-3xl"></div>
+      <div className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600 text-white relative rounded-t-3xl shadow-2xl">
+        <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 via-orange-400/20 to-pink-400/20 rounded-t-3xl"></div>
         <div className="text-center text-4xl font-bold relative z-10 drop-shadow-lg py-8 px-6 flex flex-col items-center justify-center">
           🍹 AI Party Planner 🎊
           <p className="text-white/95 text-xl mt-3 font-medium drop-shadow">
@@ -48,86 +109,113 @@ export function PartyForm({ onSubmit, loading }: PartyFormProps) {
           <div className="space-y-6">
             <div className="space-y-3">
               <Label htmlFor="occasion" className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-               What&apos;s the occasion? <span className="text-orange-500">*</span>
+                What&apos;s the occasion? <span className="text-orange-500">*</span>
               </Label>
               <Input
                 id="occasion"
-                placeholder="Birthday party, BBQ, Pool party, Game night..."
+                placeholder="Birthday, anniversary, graduation, etc..."
                 value={formData.occasion || ''}
                 onChange={(e) => setFormData(prev => ({ ...prev, occasion: e.target.value }))}
-                className="h-12 text-base border border-gray-200 focus:border-orange-400 focus:ring-orange-400/20 rounded-lg bg-white shadow-sm transition-all duration-200"
+                className="h-12 text-base leading-none border border-gray-200 focus:border-orange-400 focus:ring-orange-400/20 rounded-lg bg-white shadow-sm transition-all duration-200 px-4"
                 required
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-3">
-                <Label htmlFor="guest_count" className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                  Guest count <span className="text-orange-500">*</span>
-                </Label>
-                <Input
-                  id="guest_count"
-                  type="number"
-                  min="1"
-                  max="50"
-                  value={formData.guest_count || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, guest_count: parseInt(e.target.value) }))}
-                  className="h-12 text-base border border-gray-200 focus:border-orange-400 focus:ring-orange-400/20 rounded-lg bg-white shadow-sm transition-all duration-200"
-                  required
-                />
-              </div>
-
-              <div className="space-y-3">
-                <Label className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                  Location <span className="text-orange-500">*</span>
-                </Label>
-                <Select value={formData.location} onValueChange={(value: 'indoor' | 'outdoor') => 
-                  setFormData(prev => ({ ...prev, location: value }))}>
-                  <SelectTrigger className="h-12 text-base border border-gray-200 focus:border-orange-400 focus:ring-orange-400/20 rounded-lg bg-white shadow-sm transition-all duration-200">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-lg border border-gray-200 bg-white shadow-lg">
-                    <SelectItem value="indoor">Indoor</SelectItem>
-                    <SelectItem value="outdoor">Outdoor</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-3">
+              <Label htmlFor="guest_count" className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                How many guests? <span className="text-orange-500">*</span>
+              </Label>
+              <Input
+                id="guest_count"
+                type="number"
+                min="1"
+                max="1000"
+                value={formData.guest_count || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, guest_count: parseInt(e.target.value) }))}
+                className="h-12 text-base leading-none border border-gray-200 focus:border-orange-400 focus:ring-orange-400/20 rounded-lg bg-white shadow-sm transition-all duration-200 px-4"
+                required
+              />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-3">
-                <Label className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                 Duration <span className="text-orange-500">*</span>
-                </Label>
-                <Select value={formData.duration} onValueChange={(value: any) => 
-                  setFormData(prev => ({ ...prev, duration: value }))}>
-                  <SelectTrigger className="h-12 text-base border border-gray-200 focus:border-orange-400 focus:ring-orange-400/20 rounded-lg bg-white shadow-sm transition-all duration-200">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-lg border border-gray-200 bg-white shadow-lg">
-                    <SelectItem value="halfday">Half day</SelectItem>
-                    <SelectItem value="allday">All day</SelectItem>
-                    <SelectItem value="evening">Evening</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-3">
+              <Label className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                Location <span className="text-orange-500">*</span>
+              </Label>
+              <Select value={formData.location} onValueChange={(value: 'indoor' | 'outdoor') => 
+                setFormData(prev => ({ ...prev, location: value }))}>
+                <SelectTrigger className="h-12 text-base leading-none border border-gray-200 focus:border-orange-400 focus:ring-orange-400/20 rounded-lg bg-white shadow-sm transition-all duration-200 px-4">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="rounded-lg border border-gray-200 bg-white shadow-lg">
+                  <SelectItem value="indoor">Indoor</SelectItem>
+                  <SelectItem value="outdoor">Outdoor</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-              <div className="space-y-3">
-                <Label className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                  Time of day <span className="text-orange-500">*</span>
-                </Label>
-                <Select value={formData.time_of_day} onValueChange={(value: any) => 
-                  setFormData(prev => ({ ...prev, time_of_day: value }))}>
-                  <SelectTrigger className="h-12 text-base border border-gray-200 focus:border-orange-400 focus:ring-orange-400/20 rounded-lg bg-white shadow-sm transition-all duration-200">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-lg border border-gray-200 bg-white shadow-lg">
-                    <SelectItem value="morning">Morning</SelectItem>
-                    <SelectItem value="afternoon">Afternoon</SelectItem>
-                    <SelectItem value="evening">Evening</SelectItem>
-                  </SelectContent>
-                </Select>
+            {/* Time Section  */}
+            <div className="space-y-4">
+              <Label className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                Party Time <span className="text-orange-500">*</span>
+              </Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="start_time" className="text-sm font-medium text-gray-600">
+                    Start Time
+                  </Label>
+                  <Input
+                    id="start_time"
+                    type="time"
+                    value={formData.start_time || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, start_time: e.target.value }))}
+                    className="h-12 text-base leading-none border border-gray-200 focus:border-orange-400 focus:ring-orange-400/20 rounded-lg bg-white shadow-sm transition-all duration-200 px-4"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="end_time" className="text-sm font-medium text-gray-600">
+                    End Time
+                  </Label>
+                  <Input
+                    id="end_time"
+                    type="time"
+                    value={formData.end_time || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, end_time: e.target.value }))}
+                    className="h-12 text-base leading-none border border-gray-200 focus:border-orange-400 focus:ring-orange-400/20 rounded-lg bg-white shadow-sm transition-all duration-200 px-4"
+                    required
+                  />
+                </div>
               </div>
+              {/* Duration Display */}
+              {formData.start_time && formData.end_time && (
+                <div className="text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
+                  Duration: {(() => {
+                    const start = new Date(`2000-01-01T${formData.start_time}`);
+                    const end = new Date(`2000-01-01T${formData.end_time}`);
+                    const diff = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+                    return diff > 0 ? `${diff} hour${diff !== 1 ? 's' : ''}` : 'Invalid time range';
+                  })()}
+                </div>
+              )}
+            </div>
+
+            {/* What do you want to plan section */}
+            <div className="space-y-3">
+              <Label htmlFor="planning_focus" className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                What do you want to plan? <span className="text-orange-500">*</span>
+              </Label>
+              <Input
+                id="planning_focus"
+                placeholder="e.g., Food and decorations, Just activities, Everything..."
+                value={formData.planning_focus || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, planning_focus: e.target.value }))}
+                className="h-12 text-base leading-none border border-gray-200 focus:border-orange-400 focus:ring-orange-400/20 rounded-lg bg-white shadow-sm transition-all duration-200 px-4"
+                required
+              />
+              <p className="text-sm text-gray-500">
+                Tell us what aspects you&apos;d like help with (food, decorations, activities, music, etc.)
+              </p>
             </div>
           </div>
 
@@ -139,25 +227,32 @@ export function PartyForm({ onSubmit, loading }: PartyFormProps) {
             
             <div className="space-y-3">
               <Label htmlFor="dietary_restrictions" className="text-lg font-semibold text-gray-800">
-              Dietary restrictions
+                Dietary restrictions
               </Label>
               <Input
                 id="dietary_restrictions"
                 placeholder="Vegetarian, gluten-free, allergies, etc..."
                 value={formData.dietary_restrictions || ''}
                 onChange={(e) => setFormData(prev => ({ ...prev, dietary_restrictions: e.target.value }))}
-                className="h-12 text-base border border-gray-200 focus:border-emerald-400 focus:ring-emerald-400/20 rounded-lg bg-white shadow-sm transition-all duration-200"
+                className="h-12 text-base leading-none border border-gray-200 focus:border-emerald-400 focus:ring-emerald-400/20 rounded-lg bg-white shadow-sm transition-all duration-200 px-4"
               />
             </div>
 
             <div className="space-y-3">
               <Label className="text-lg font-semibold text-gray-800">
-              Guest ages
+                Guest ages
               </Label>
-              <Select value={formData.guest_ages} onValueChange={(value: any) => 
-                setFormData(prev => ({ ...prev, guest_ages: value }))}>
-                <SelectTrigger className="h-12 text-base border border-gray-200 focus:border-emerald-400 focus:ring-emerald-400/20 rounded-lg bg-white shadow-sm transition-all duration-200">
-                  <SelectValue placeholder="Select age group" />
+              <Select
+                value={formData.guest_ages}
+                onValueChange={(value: 'kids' | 'adults' | 'mixed') =>
+                  setFormData((prev) => ({ ...prev, guest_ages: value }))
+                }
+              >
+                <SelectTrigger className="h-12 border border-gray-200 focus:border-emerald-400 focus:ring-emerald-400/20 rounded-lg bg-white shadow-sm transition-all duration-200 px-4 text-left text-base">
+                  <SelectValue
+                    placeholder="Select age group"
+                    className="text-base"
+                  />
                 </SelectTrigger>
                 <SelectContent className="rounded-lg border border-gray-200 bg-white shadow-lg">
                   <SelectItem value="kids">Kids</SelectItem>
@@ -169,21 +264,21 @@ export function PartyForm({ onSubmit, loading }: PartyFormProps) {
 
             <div className="space-y-3">
               <Label htmlFor="special_requests" className="text-lg font-semibold text-gray-800">
-              Special requests
+                Special requests
               </Label>
               <Textarea
                 id="special_requests"
                 placeholder="Any specific themes, activities, or special requirements..."
                 value={formData.special_requests || ''}
                 onChange={(e) => setFormData(prev => ({ ...prev, special_requests: e.target.value }))}
-                className="min-h-[100px] text-base resize-none border border-gray-200 focus:border-emerald-400 focus:ring-emerald-400/20 rounded-lg bg-white shadow-sm p-4 transition-all duration-200"
+                className="min-h-[100px] text-base leading-relaxed resize-none border border-gray-200 focus:border-emerald-400 focus:ring-emerald-400/20 rounded-lg bg-white shadow-sm p-4 transition-all duration-200"
               />
             </div>
           </div>
 
           <Button 
             type="submit" 
-            className="w-full h-16 text-xl font-bold text-white border-0 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl shadow-xl rounded-xl relative overflow-hidden group bg-gradient-to-r from-orange-400 via-pink-500 via-red-500 to-purple-600 hover:from-orange-500 hover:via-pink-600 hover:via-red-600 hover:to-purple-700 backdrop-blur-md" 
+            className="w-full h-16 text-xl font-bold text-white border-0 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl shadow-xl rounded-xl relative overflow-hidden group bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600 hover:from-orange-500 hover:via-pink-600 hover:to-purple-700 backdrop-blur-md" 
             disabled={loading}
           >
             <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-50 group-hover:opacity-70 transition-opacity duration-300"></div>

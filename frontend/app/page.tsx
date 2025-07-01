@@ -3,14 +3,41 @@
 import { useState } from 'react';
 import { PartyForm } from '../components/party-form';
 import { PartyPlanResult } from '../components/party-plan-result';
-import { PartyRequest, PartyPlanResponse } from '../types/party';
+import { PartyPlanResponse } from '../types/party';
+
+// Backend interface (what the API expects)
+interface BackendPartyRequest {
+  occasion: string;
+  guest_count: number;
+  location: 'indoor' | 'outdoor';
+  start_time: string;
+  end_time: string;
+  duration_hours: number;
+  time_of_day: 'morning' | 'afternoon' | 'evening';
+  planning_focus: string;
+  dietary_restrictions?: string;
+  guest_ages?: 'kids' | 'adults' | 'mixed';
+  special_requests?: string;
+}
+
+// Define proper error response types
+interface ErrorDetail {
+  msg?: string;
+  type?: string;
+  loc?: string[];
+}
+
+interface ErrorResponse {
+  detail?: string | ErrorDetail[];
+  message?: string;
+}
 
 export default function Home() {
   const [partyPlan, setPartyPlan] = useState<PartyPlanResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (request: PartyRequest) => {
+  const handleSubmit = async (request: BackendPartyRequest) => {
     setLoading(true);
     setError(null);
 
@@ -25,8 +52,24 @@ export default function Home() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+        let errorMessage = `HTTP error! status: ${response.status}`;
+        try {
+          const errorData: ErrorResponse = await response.json();
+          // Handle different error response formats
+          if (typeof errorData === 'string') {
+            errorMessage = errorData;
+          } else if (errorData.detail) {
+            errorMessage = Array.isArray(errorData.detail) 
+              ? errorData.detail.map((err: ErrorDetail) => err.msg || err.type || 'Unknown error').join(', ')
+              : errorData.detail;
+          } else if (errorData.message) {
+            errorMessage = errorData.message;
+          }
+        } catch (jsonError) {
+          // If response.json() fails, use the default error message
+          console.warn('Failed to parse error response:', jsonError);
+        }
+        throw new Error(errorMessage);
       }
 
       const data: PartyPlanResponse = await response.json();
