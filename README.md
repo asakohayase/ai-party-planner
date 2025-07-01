@@ -178,6 +178,10 @@ We can easily add more agents or tools:
 - **Music & Playlist Specialist** - Spotify search tool, playlist generation
 - **Marketing Specialist** - social media content creation, email invitation tools, RSVP tracking
 
+Other enhancements:
+- Convert to conversational chat interface for follow-up questions and iterative planning
+- Add agent memory for multi-turn conversations
+
 ## **6. Links**
 - **Live Demo:** https://ai-party-planner.vercel.app
 - **Strands Agents SDK:** https://docs.strands.ai  
