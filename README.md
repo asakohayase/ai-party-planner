@@ -92,7 +92,7 @@ def activity_entertainment_specialist(party_details: str) -> str:
 - uv package manager: `pip install uv`
 - AWS credentials for Strands Agents SDK
 
-### **. Installation**
+### ** Installation**
 
 1. **Clone and setup:**
 ```bash
@@ -137,7 +137,8 @@ npm run dev
 ```
 Access: http://localhost:3000
 
-### **4. Project Structure**
+
+## **4. Project Structure**
 ```
 ai-party-planner/
 ├── backend/
