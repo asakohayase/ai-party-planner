@@ -137,7 +137,7 @@ npm run dev
 ```
 Access: http://localhost:3000
 
-### **3. Project Structure**
+### **4. Project Structure**
 ```
 ai-party-planner/
 ├── backend/
@@ -170,14 +170,14 @@ ai-party-planner/
     └── eslint.config.mjs
 ```
 
-## **4. Extending the Demo**
+## **5. Extending the Demo**
 
 **New Specialist Ideas:**
 - **Venue Specialist** - website search tools, booking APIs
 - **Music & Playlist Specialist** - Spotify search tool, playlist generation
 - **Marketing Specialist** - social media content creation, email invitation tools, RSVP tracking
 
-## **5. Links**
+## **6. Links**
 - **Live Demo:** https://ai-party-planner.vercel.app
 - **Strands Agents SDK:** https://docs.strands.ai  
 - **Multi-Agent Examples:** https://github.com/strands-agents/docs/blob/main/docs/examples/
