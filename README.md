@@ -4,12 +4,12 @@
 
 A demonstration project showcasing the **Strands Agents SDK's "Agents as Tools"** pattern through an intelligent party planning system. This project implements a hierarchical multi-agent architecture where a Party Director coordinates three specialized agents to create comprehensive party plans.
 
-## **Agent Architecture Diagram**
+## **1. Agent Architecture Diagram**
 
 <img width="554" alt="Image" src="https://github.com/user-attachments/assets/643b8d0c-67bc-439c-ae16-25f7e0a60337" />
 
 
-## **1. Core Implementation**
+## **2. Core Implementation**
 
 ### **a. Party Director (Orchestrator)**
 The main agent coordinates specialists based on user requirements:
@@ -137,7 +137,7 @@ npm run dev
 ```
 Access: http://localhost:3000
 
-### **2. Project Structure**
+### **3. Project Structure**
 ```
 ai-party-planner/
 ├── backend/
@@ -170,14 +170,14 @@ ai-party-planner/
 └── eslint.config.mjs
 ```
 
-## **3. Extending the Demo**
+## **4. Extending the Demo**
 
 **New Specialist Ideas:**
 - **Venue Specialist** - website search tools, booking APIs
 - **Music & Playlist Specialist** - Spotify search tool, playlist generation
 - **Marketing Specialist** - social media content creation, email invitation tools, RSVP tracking
 
-## **4. Links**
+## **5. Links**
 - **Live Demo:** https://ai-party-planner.vercel.app
 - **Strands Agents SDK:** https://docs.strands.ai  
 - **Multi-Agent Examples:** https://github.com/strands-agents/docs/blob/main/docs/examples/
