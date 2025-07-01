@@ -92,7 +92,7 @@ def activity_entertainment_specialist(party_details: str) -> str:
 - uv package manager: `pip install uv`
 - AWS credentials for Strands Agents SDK
 
-### ** Installation**
+### **Installation**
 
 1. **Clone and setup:**
 ```bash
@@ -173,7 +173,7 @@ ai-party-planner/
 
 ## **5. Extending the Demo**
 
-**New Specialist Ideas:**
+We can easily add more agents or tools:
 - **Venue Specialist** - website search tools, booking APIs
 - **Music & Playlist Specialist** - Spotify search tool, playlist generation
 - **Marketing Specialist** - social media content creation, email invitation tools, RSVP tracking
