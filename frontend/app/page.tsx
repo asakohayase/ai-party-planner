@@ -29,8 +29,11 @@ export default function Home() {
     try {
       console.log('Sending request to backend:', JSON.stringify(request, null, 2));
       
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      console.log('API URL:', apiUrl);
+      
       // Call Python backend API
-      const response = await fetch('http://localhost:8000/api/party-plan', {
+      const response = await fetch(`${apiUrl}/api/party-plan`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -79,7 +82,7 @@ export default function Home() {
       setError(
         err instanceof Error 
           ? err.message 
-          : 'Network error. Please make sure the Python backend is running on port 8000.'
+          : 'Network error. Please check your internet connection and try again.'
       );
     } finally {
       setLoading(false);
@@ -99,7 +102,7 @@ export default function Home() {
             <h3 className="font-bold text-lg">⚠️ Oops!</h3>
             <p className="mt-1">{error}</p>
             <p className="text-sm mt-2 opacity-75">
-              Make sure your Python backend is running: <code className="bg-red-200 px-1 rounded">cd backend && uv run python app.py</code>
+              If the issue persists, please check that both frontend and backend services are running properly.
             </p>
           </div>
         )}
