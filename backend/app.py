@@ -16,10 +16,7 @@ app = FastAPI(title="AI Party Planner", version="1.0.0")
 # Add CORS middleware for frontend communication
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://ai-party-planner.vercel.app",
-    ],  # Add comma here
+    allow_origins=["http://localhost:3000", "https://ai-party-planner.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
