@@ -9,9 +9,9 @@ A demonstration project showcasing the **Strands Agents SDK's "Agents as Tools"*
 <img width="554" alt="Image" src="https://github.com/user-attachments/assets/643b8d0c-67bc-439c-ae16-25f7e0a60337" />
 
 
-## **Core Implementation**
+## **1. Core Implementation**
 
-### **1. Party Director (Orchestrator)**
+### **a. Party Director (Orchestrator)**
 The main agent coordinates specialists based on user requirements:
 
 ```python
@@ -44,7 +44,7 @@ party_director = Agent(
 )
 ```
 
-### **2. Specialist Agents as Tools**
+### **b. Specialist Agents as Tools**
 Each specialist is wrapped with the `@tool` decorator, making them callable by the orchestrator:
 
 ```python
@@ -78,21 +78,21 @@ def activity_entertainment_specialist(party_details: str) -> str:
         return f"Error in activity & entertainment planning: {str(e)}"
 ```
 
-### **3. Key Strands SDK Features Demonstrated**
+### **c. Key Strands SDK Features Demonstrated**
 
 - **Simple Agent Creation**: Strands SDK only requires a model, prompt, and tools - no complex setup needed
 - **Agents as Tools**: Specialist agents wrapped with `@tool` decorator for hierarchical coordination
 - **Intelligent Tool Selection**: Dynamic agent routing based on user requirements
 
 
-### **4. Quick Startd**
+### **d. Quick Startd**
 
 ### **Prerequisites**
 - Python 3.11+, Node.js 18+
-- Strands Agents SDK: `pip install strands-agents`
-- AI provider API key
+- uv package manager: `pip install uv`
+- AWS credentials for Strands Agents SDK
 
-### **5. Installation**
+### **e. Installation**
 
 1. **Clone and setup:**
 ```bash
@@ -109,7 +109,7 @@ AWS_SECRET_ACCESS_KEY=your_aws_secret_key
 3. Backend setup:
 ```bash
 cd backend
-uv pip install -r requirements.txt
+uv install
 ```
 
 4. Frontend setup:
@@ -127,7 +127,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 Backend (terminal 1):
 ```bash
 cd backend
-uvicorn app:app --reload --port 8000
+uv run uvicorn app:app --reload --port 8000
 ```
 
 Frontend (terminal 2):
@@ -137,37 +137,47 @@ npm run dev
 ```
 Access: http://localhost:3000
 
-### **6. Project Structure**
+### **2. Project Structure**
 ```
 ai-party-planner/
 ├── backend/
 │   ├── agents/
-│   │   ├── party_director.py      # Main orchestrator
-│   │   ├── food_specialist.py     # @tool agent
-│   │   ├── theme_specialist.py    # @tool agent  
-│   │   └── activity_specialist.py # @tool agent
+│   │   ├── party_director.py      # Main orchestrator agent
+│   │   ├── food_specialist.py     # Specialized agent as tool
+│   │   ├── theme_specialist.py    # Specialized agent as tool
+│   │   └── activity_specialist.py # Specialized agent as tool
+│   ├── tools/
+│   │   └── time_calculator.py     # Calculator tool
 │   ├── models/
 │   │   └── party_request.py       # Pydantic models
 │   ├── app.py                     # FastAPI server
-│   └── requirements.txt
+│   ├── requirements.txt
+│   └── pyproject.toml
 └── frontend/
-    ├── components/
-    │   ├── party-form.tsx         # Input form
-    │   └── party-plan-result.tsx  # Results display
-    ├── app/
-    │   ├── layout.tsx
-    │   └── page.tsx
-    └── package.json
+├── components/
+│   ├── ui/                   
+│   ├── party-form.tsx         # Input form
+│   └── party-plan-result.tsx  # Results display
+├── types/
+│   └── party.ts               # TypeScript interfaces
+├── app/
+│   ├── layout.tsx
+│   ├── page.tsx
+│   └── globals.css
+├── public/            
+├── package.json
+├── next.config.ts
+└── eslint.config.mjs
 ```
 
-## **7. Extending the Demo**
+## **3. Extending the Demo**
 
 **New Specialist Ideas:**
 - **Venue Specialist** - website search tools, booking APIs
 - **Music & Playlist Specialist** - Spotify search tool, playlist generation
 - **Marketing Specialist** - social media content creation, email invitation tools, RSVP tracking
 
-## **8. Links**
+## **4. Links**
 - **Live Demo:** https://ai-party-planner.vercel.app
 - **Strands Agents SDK:** https://docs.strands.ai  
 - **Multi-Agent Examples:** https://github.com/strands-agents/docs/blob/main/docs/examples/
