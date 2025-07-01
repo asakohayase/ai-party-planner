@@ -130,7 +130,7 @@ cd backend
 uv run uvicorn app:app --reload --port 8000
 ```
 
-Frontend (terminal 2):
+7. Frontend (terminal 2):
 ```bash
 cd frontend
 npm run dev
