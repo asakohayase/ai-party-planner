@@ -4,6 +4,8 @@
 
 A demonstration project showcasing the **Strands Agents SDK's "Agents as Tools"** pattern through an intelligent party planning system. This project implements a hierarchical multi-agent architecture where a Party Director coordinates three specialized agents to create comprehensive party plans.
 
+![Image](https://github.com/user-attachments/assets/894a66eb-a9f2-4f4e-b92b-d25259608621)
+
 ## **1. Agent Architecture Diagram**
 
 <img width="554" alt="Image" src="https://github.com/user-attachments/assets/643b8d0c-67bc-439c-ae16-25f7e0a60337" />
@@ -177,6 +179,10 @@ We can easily add more agents or tools:
 - **Venue Specialist** - website search tools, booking APIs
 - **Music & Playlist Specialist** - Spotify search tool, playlist generation
 - **Marketing Specialist** - social media content creation, email invitation tools, RSVP tracking
+
+Other enhancements:
+- Convert to conversational chat interface for follow-up questions and iterative planning
+- Add agent memory for multi-turn conversations
 
 ## **6. Links**
 - **Live Demo:** https://ai-party-planner.vercel.app
