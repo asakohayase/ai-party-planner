@@ -6,6 +6,8 @@ A demonstration project showcasing the **Strands Agents SDK's "Agents as Tools"*
 
 ## **Agent Architecture Diagram**
 
+<img width="554" alt="Image" src="https://github.com/user-attachments/assets/643b8d0c-67bc-439c-ae16-25f7e0a60337" />
+
 
 ## **Core Implementation**
 
@@ -91,35 +93,49 @@ def activity_entertainment_specialist(party_details: str) -> str:
 - AI provider API key
 
 ### **5. Installation**
+
+1. **Clone and setup:**
 ```bash
-# Clone and setup
 git clone https://github.com/your-username/ai-party-planner.git
 cd ai-party-planner
+```
 
-# Create root .env file with required credentials
-cat > .env << EOF
-# AWS credentials for Strands Agents SDK (uses Bedrock by default)
+2. Create .env file in the root directory:
+```bash
 AWS_ACCESS_KEY_ID=your_aws_access_key
 AWS_SECRET_ACCESS_KEY=your_aws_secret_key
-EOF
+```
 
-# Backend setup
+3. Backend setup:
+```bash
 cd backend
-pip install -r requirements.txt
+uv pip install -r requirements.txt
+```
 
-# Frontend setup  
+4. Frontend setup:
+```bash
 cd ../frontend
 npm install
-echo "NEXT_PUBLIC_API_URL=http://localhost:8000" > .env.local
+```
 
-# Run backend server
-cd ../backend
+5. Create .env.local in the frontend directory:
+```
+NEXT_PUBLIC_API_URL=http://localhost:8000
+````
+
+6. Run the applications:
+Backend (terminal 1):
+```bash
+cd backend
 uvicorn app:app --reload --port 8000
+```
 
-# In a new terminal, run frontend
+Frontend (terminal 2):
+```bash
 cd frontend
 npm run dev
 ```
+Access: http://localhost:3000
 
 ### **6. Project Structure**
 ```
@@ -147,12 +163,9 @@ ai-party-planner/
 ## **7. Extending the Demo**
 
 **New Specialist Ideas:**
-- **Music & Playlist Specialist** - Spotify API, music recommendation tools
-- **Budget & Cost Calculator** - calculation tools, price lookup APIs  
-- **Invitation Designer** - image generation tools, template libraries
-- **Cleanup Coordinator** - scheduling tools, checklist generators
-- **Weather Advisor** - weather APIs, outdoor activity recommendations
-- **Photo Booth Specialist** - camera tools, prop suggestion databases
+- **Venue Specialist** - website search tools, booking APIs
+- **Music & Playlist Specialist** - Spotify search tool, playlist generation
+- **Marketing Specialist** - social media content creation, email invitation tools, RSVP tracking
 
 ## **8. Links**
 - **Live Demo:** https://ai-party-planner.vercel.app
