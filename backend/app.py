@@ -29,6 +29,12 @@ async def root():
     return {"message": "AI Party Planner API", "status": "running"}
 
 
+@app.options("/api/party-plan")
+async def party_plan_options():
+    """Handle preflight OPTIONS requests for CORS"""
+    return {"message": "OK"}
+
+
 @app.post("/api/party-plan", response_model=PartyPlanResponse)
 async def create_party_plan(request_data: dict):
     """
