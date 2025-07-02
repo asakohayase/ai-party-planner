@@ -8,7 +8,7 @@ A demonstration project showcasing the **Strands Agents SDK's "Agents as Tools"*
 
 ## **1. Agent Architecture Diagram**
 
-<img width="1162" alt="Image" src="https://github.com/user-attachments/assets/6ac39e53-4f9a-4e48-be7b-159c228c221f" />
+<img width="1161" alt="Image" src="https://github.com/user-attachments/assets/2cb46a89-0661-4fe3-ac4a-ce06199a228c" />
 
 
 ## **2. Core Implementation**
