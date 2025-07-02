@@ -98,7 +98,7 @@ def activity_entertainment_specialist(party_details: str) -> str:
 
 1. **Clone and setup:**
 ```bash
-git clone https://github.com/your-username/ai-party-planner.git
+git clone https://github.com/asakohayase/ai-party-planner.git
 cd ai-party-planner
 ```
 
